@@ -32,6 +32,15 @@ async def reply_to_message(req_body, vk_api: 'API', session: 'AsyncSession'):
 	sender_id = req_body['object']['message']['from_id']
 
 	replies = await get_response(session, message_text)
+
+	if len(replies) == 0:
+		vk_api.messages.send(
+			user_id = sender_id,
+			message = "Извните я вас не понимаю. Позвать кожаного мешка?",
+			random_id = random.randint(0, 2**31),
+			v=5.131
+		)
+
 	for reply in replies:
 		vk_api.messages.send(
 			user_id = sender_id,
