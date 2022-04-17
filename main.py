@@ -1,12 +1,15 @@
+import random
 import uvicorn
 import vk
 
 from pydantic import BaseSettings
 from fastapi import FastAPI, Request, Response, HTTPException, Depends
+from fastapi.responses import HTMLResponse
 
 from sqlalchemy.orm.session import sessionmaker
 from sqlalchemy.ext.asyncio.engine import create_async_engine
 from sqlalchemy.ext.asyncio.session import AsyncSession
+from sqlalchemy import text
 
 from common.reply import reply_to_message
 
@@ -56,6 +59,26 @@ async def auth(req: Request, session: AsyncSession = Depends(get_session)):
 		'message_new': reply_to_message
 	}.get(req_body['type'], lambda **kwargs: False)(req_body=req_body, vk_api=vk_api, session=session)
 	return response
+
+@app.get('/admin', response_class=HTMLResponse)
+async def admin():
+	file = open('./frontend/admin.html')
+	return file.read()
+
+@app.post('/send/{group_id}')
+async def send(group_id, message, session: AsyncSession = Depends(get_session)):
+	print(message)
+
+	sql_text = text(f"SELECT chat_id FROM users WHERE group_id = {group_id}")
+	response = (await session.execute(sql_text)).all()
+
+	for i in response:
+		vk_api.messages.send(
+			user_id = i,
+			message = message,
+			random_id = random.randint(0, 2**31),
+			v=5.131
+		)
 
 if __name__ == "__main__":
 	uvicorn.run('main:app', port=5000, reload=True)

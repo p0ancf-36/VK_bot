@@ -1,29 +1,29 @@
 import sqlite3
 from tkinter import CURRENT
 
-connection = sqlite3.connect("cars_db.sqlite")
+connection = sqlite3.connect("db.sqlite")
 cursor = connection.cursor()
 
-cursor.execute("""SELECT
-car_models.model,
-cars.car_color,
-owners.name,
-owners.card
-FROM cars, car_models, owners
-WHERE cars.owner_id = owners.id and cars.car_model_id = car_models.id and car_models.mark = \"Chevrolet\"""")
+cursor.execute("""
+	CREATE TABLE IF NOT EXISTS groups (
+		id INTEGER PRIMARY KEY,
+		name TEXT
+	)
+""")
+cursor.execute("""
+	CREATE TABLE IF NOT EXISTS users (
+		id INTEGER PRIMARY KEY,
+		chat_id INTEGER,
+		group_id INTEGER,
 
-response = cursor.fetchall()
+		FOREIGN KEY (group_id) REFERENCES groups(id)
+	)
+""")
 
-ELEMENT_LEN = 20
+cursor.execute("INSERT INTO groups VALUES(1, \"friends\")")
+cursor.execute("INSERT INTO groups VALUES(2, \"classmates\")")
+cursor.execute("INSERT INTO groups VALUES(3, \"programmers\")")
 
-response_len = len(response)
-response_el_len = len(response[0])
-
-print(("+" + "-" * (ELEMENT_LEN + 1)) * response_el_len, end="+\n")
-for i in response:
-	print(end="| ")
-	for j in i:
-		print(f"{j: <20}", end="| ")
-	print("\n" + ("+" + "-" * (ELEMENT_LEN + 1)) * response_el_len, end="+\n")
+connection.commit()
 
 connection.close()

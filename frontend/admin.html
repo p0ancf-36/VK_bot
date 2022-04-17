@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>VK bot admin</title>
+	
+	<style>
+		body, body * {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+
+			display: block;
+		}
+	</style>
+
+	<script defer>
+		const url = "https://5a12-37-79-14-199.ngrok.io"
+
+		async function send () {
+			console.log(parseInt(document.getElementById('type').value));
+
+			await fetch(`${url}/send/${parseInt(document.getElementById('type').value)}`,
+				{
+					method: "POST",
+					body: document.getElementById('text').value
+				}
+			)
+		}
+	</script>
+</head>
+<body>
+	<textarea type="text" name="" id="text"></textarea>
+	<select id="type">
+		<option value="1">friends</option>
+		<option value="2">classmates</option>
+		<option value="3">programmers</option>
+	</select>
+	<button onclick="send()">send</button>
+</body>
+</html>
